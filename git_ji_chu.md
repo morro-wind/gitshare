@@ -52,6 +52,140 @@ Git 拉取的是服务器端所有资料的复本，项目历史中所有文档�
 Untracked files 下发显示的就是未被跟踪的文件。除非明确指定要将文件加入提交的快照，Git 不会主动将它加入。
 
 ##跟踪新文件
-使用 `git add` 命令，跟踪新增文件
+使用 `git add` 命令，跟踪新增文件：
 
     $git add README
+再次查看文件状态,已被列入跟踪并且已暂存：  
+
+    $git status
+    On branch master
+    Changes to be committed:
+      (use "git reset HEAD <file>..." to unstage)
+    
+            new file:   README
+Changes to be commited下方的是已暂存的文件。此时提交更新，则被暂存的文件就会被记录在历史快照中。  
+
+##暂存已修改文件
+修改已被跟踪的文件 `benchmarks.rb`,并查看文件状态：
+
+    $git status
+    On branch master
+    Changes to be committed:
+     (use "git reset HEAD <file>..." to unstage)
+    
+            new file:   README
+
+    Changes not staged for commit:
+      (use "git add <file>..." to update what will be committed)
+      (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   benchmarks.rb
+
+***"Changes not staged for commit"***下发文件代表着文件已被跟踪且已被修改，但尚未暂存。暂存可执行`git add`命令（这是一个多用途的指令）。   
+
+将已暂存的`benchmarks.rb`再做一些修改后提交，再查看文件状态：
+
+    $git status
+    On branch master
+    Changes to be committed:
+      (use "git reset HEAD <file>..." to unstage)
+
+            new file:   README
+            modified:   benchmarks.rb
+
+    Changes not staged for commit:
+      (use "git add <file>..." to update what will be committed)
+      (use "git checkout -- <file>..." to discard changes in working directory)
+
+            modified:   benchmarks.rb
+            
+`benchmarks.rb`同时被列在已被暂存及未被暂存。现在提交更新，则最近一次执行`git add`命令时暂存的`benchmarks.rb`会被提交。若在`git add`后修改文件，则需要修改后再次执行`git add`将最新版的文件暂存起：  
+
+    $ git add benchmarks.rb
+    $ git status
+    On branch master
+    Changes to be committed:
+      (use "git reset HEAD <file>..." to unstage)
+    
+            new file:   README
+            modified:   benchmarks.rb
+##忽略文件
+通常会有一些文件不想让Git自动新增，也不希望被列入未被跟踪的文件。这些文件通常是自动生成的。将这些文件名写入`.gitignore`文件：  
+
+    $ cat .gitignore
+    *.[oa]
+    *~
+第一列告诉Git忽略任何文件名为`.o`或`.a`结尾的文件。第二列告诉Git忽略所有文件名为`~`结尾的文件。  
+
+编写`.gitignore`文件的规则：  
+* 空白列或者以#开头的列会被忽略
+* 可使用标准的Glob pattern
+* 可以/结尾，代表是目录
+* 可使用!符号取反  
+
+另一个`.gitignore`范例：  
+
+    # 註解，會被忽略。
+    # 不要追蹤檔名為 .a 結尾的檔案
+    *.a
+    # 但是要追蹤 lib.a，即使上方已指定忽略所有的 .a 檔案
+    !lib.a
+    # 只忽略根目錄下的 TODO 檔案。 不包含子目錄下的 TODO
+    /TODO
+    # 忽略build/目錄下所有檔案
+    build/
+    # 忽略doc/notes.txt但不包含doc/server/arch.txt
+    doc/*.txt
+    # ignore all .txt files in the doc/ directory
+    doc/**/*.txt
+
+##查看修改
+`git diff` 可以查看尚未暂存的文件更新了哪些部分。此命令比较的是工作目录中当前文件和暂存区快照之间的差异，也就是暂存起来的变化内容。  
+
+    $ git diff
+    diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+    index 8ebb991..643e24f 100644
+    --- a/CONTRIBUTING.md
+    +++ b/CONTRIBUTING.md
+    @@ -65,7 +65,8 @@ branch directly, things can get messy.
+     Please include a nice description of your changes when you submit your PR;
+     if we have to read the whole diff to figure out why you're contributing
+     in the first place, you're less likely to get feedback and have your change
+    -merged in.
+    +merged in. Also, split your changes into comprehensive chunks if your patch is
+    +longer than a dozen lines.
+    
+     If you are starting to work on a particular area, feel free to submit a PR
+     that highlights your work in progress (and note in the PR title that it's
+
+若要查看已暂存的将要添加到下次提交里的内容，可以使用`git diff --cached`命令。  
+`git diff`本身只显示尚未暂存的改动。
+
+##提交更系
+在提交之前请一定要确认还有什么修改过的或新建的文件还没有`git add`过，否则提交的时候不会记录这些还没暂存起来的变化。每次准备提交前，先用`git status`看下，是否都已暂存起来了，然后再执行`git commit`：  
+
+    $git commit
+    
+    # Please enter the commit message for your changes. Lines starting
+    # with '#' will be ignored, and an empty message aborts the commit.
+    # On branch master
+    # Changes to be committed:
+    #       new file:   README
+    #       modified:   benchmarks.rb
+    #
+    ~
+    ~
+    ~
+    ".git/COMMIT_EDITMSG" 10L, 283C
+开头有一行空行，供输入提交说明。可使用`-m` 参数指定提交信息：
+
+    $ git commit -m "Story 182: Fix benchmarks for speed"
+    [master 463dc4f] Story 182: Fix benchmarks for speed
+     2 files changed, 3 insertions(+)
+     create mode 100644 README
+
+现在已建立地一个提交。输出信息可看出此提交、放到哪个分支（master）、SHA-1校验码（463dc4f），以及本次提交中，有多少文件修订过，多少行添加和删除过。
+
+提交时记录的是放在暂存区域的快照。任何未暂存的仍然保持已修改状态。
+
+
