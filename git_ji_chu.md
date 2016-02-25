@@ -191,4 +191,121 @@ Changes to be commited下方的是已暂存的文件。此时提交更新，则�
 ##跳过使用暂存区域
 使用`git commit -a`可跳过暂存区域，Git会自动把所有已经跟踪过的文件暂存起来一并提交从而跳过`git add`这步
 
+    $ git status
+    On branch master
+    Changes not staged for commit:
+      (use "git add <file>..." to update what will be committed)
+      (use "git checkout -- <file>..." to discard changes in working directory)
+    
+        modified:   CONTRIBUTING.md
+    
+    no changes added to commit (use "git add" and/or "git commit -a")
+    $ git commit -a -m 'added new benchmarks'
+    [master 83e38c7] added new benchmarks
+     1 file changed, 5 insertions(+), 0 deletions(-)
 
+##移除文件
+Git移除文件需要从已跟踪文件清单中移除（暂存区），然后提交。可以使用`git rm`命令，并连带从工作目录中删除指定的文件  
+将文件从Git仓库中删（从暂存区移除），但保留在留在工作目录中，可使用`--cached`选项
+
+    $git rm --cached README
+##移动文件
+`git mv`可以重命名文件：
+
+    $git mv file_from file_to
+`git mv`相当于运行了下面三条命令：
+
+    $mv README.md README
+    $git rm README.md
+    $git add README
+
+##查看提交历史
+`git log`命令可以查看项目的提交历史
+
+    $ git log
+    commit ca82a6dff817ec66f44342007202690a93763949
+    Author: Scott Chacon <schacon@gee-mail.com>
+    Date:   Mon Mar 17 21:52:11 2008 -0700
+    
+        changed the version number
+    
+    commit 085bb3bcb608e1e8451d4b2432f8ecbe6306e7e7
+    Author: Scott Chacon <schacon@gee-mail.com>
+    Date:   Sat Mar 15 16:40:33 2008 -0700
+    
+        removed unnecessary test
+    
+    commit a11bef06a3f659402fe7563abf99ad00de2209e6
+    Author: Scott Chacon <schacon@gee-mail.com>
+    Date:   Sat Mar 15 10:31:28 2008 -0700
+    
+        first commit
+
+不用任何参数的话，`git log`会按提交时间列出所有的更新，最近的更新排在最上面。
+
+-p 用来显示每次提交内容的差异。你也可以加上-2来显示最近两次提交：
+
+    $ git log -p -2
+    commit ca82a6dff817ec66f44342007202690a93763949
+    Author: Scott Chacon <schacon@gee-mail.com>
+    Date:   Mon Mar 17 21:52:11 2008 -0700
+    
+        changed the version number
+    
+    diff --git a/Rakefile b/Rakefile
+    index a874b73..8f94139 100644
+    --- a/Rakefile
+    +++ b/Rakefile
+    @@ -5,7 +5,7 @@ require 'rake/gempackagetask'
+     spec = Gem::Specification.new do |s|
+         s.platform  =   Gem::Platform::RUBY
+         s.name      =   "simplegit"
+    -    s.version   =   "0.1.0"
+    +    s.version   =   "0.1.1"
+         s.author    =   "Scott Chacon"
+         s.email     =   "schacon@gee-mail.com"
+         s.summary   =   "A simple gem for using Git in Ruby code."
+    
+    commit 085bb3bcb608e1e8451d4b2432f8ecbe6306e7e7
+    Author: Scott Chacon <schacon@gee-mail.com>
+    Date:   Sat Mar 15 16:40:33 2008 -0700
+    
+        removed unnecessary test
+    
+    diff --git a/lib/simplegit.rb b/lib/simplegit.rb
+    index a0a60ae..47c6340 100644
+    --- a/lib/simplegit.rb
+    +++ b/lib/simplegit.rb
+    @@ -18,8 +18,3 @@ class SimpleGit
+         end
+    
+     end
+    -
+    -if $0 == __FILE__
+    -  git = SimpleGit.new
+    -  puts git.show
+    -end
+    \ No newline at end of file
+
+git log 常用选项
+
+    选项 	            说明
+
+    -p               按补丁格式显示每个更新之间的差异。
+
+    --stat           显示每次更新的文件修改统计信息。
+    
+    --shortstat      只显示 --stat 中最后的行数修改添加移除统计。
+    
+    --name-only      仅在提交信息后显示已修改的文件清单。
+    
+    --name-status    显示新增、修改、删除的文件清单。
+    
+    --abbrev-commit  仅显示 SHA-1 的前几个字符，而非所有的 40 个字符。
+    
+    --relative-date  使用较短的相对时间显示（比如，“2 weeks ago”）。
+    
+    --graph          显示 ASCII 图形表示的分支合并历史。
+    
+    --pretty         使用其他格式显示历史提交信息。可用的选项包括 oneline，short，full，fuller 和 format（后跟指定格式）。
+    
